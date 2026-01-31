@@ -1,0 +1,4 @@
+#!/bin/bash
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
+time make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
+cp -p arch/riscv/boot/Image* /output/

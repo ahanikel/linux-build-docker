@@ -1,0 +1,26 @@
+# Use the native arm64 image for speed
+FROM ubuntu:24.04
+
+# Prevent interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install cross-compilation and kernel build tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc-riscv64-linux-gnu \
+    binutils-riscv64-linux-gnu \
+    bc \
+    rsync \
+    flex \
+    bison \
+    libssl-dev \
+    libncurses-dev \
+    libelf-dev \
+    git \
+    vim \
+    dwarves \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+WORKDIR /linux
