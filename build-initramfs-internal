@@ -1,0 +1,24 @@
+#!/bin/bash
+cd /
+git clone https://git.busybox.net/busybox
+cd busybox
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
+sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
+        s/CONFIG_TC=y/CONFIG_TC=n/;
+        s/CONFIG_FEATURE_TC_INGRESS=y/CONFIG_FEATURE_TC_INGRESS=n/' \
+       .config
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- oldconfig
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- install
+mkdir -p _install/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin,dev}
+cat <<EOF > _install/init
+#!/bin/sh
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs devtmpfs /dev
+
+echo "Welcome to RISC-V Linux!"
+exec /bin/sh
+EOF
+chmod +x _install/init
+(cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
