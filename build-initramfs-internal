@@ -18,7 +18,7 @@ mount -t sysfs none /sys
 mount -t devtmpfs devtmpfs /dev
 
 echo "Welcome to RISC-V Linux!"
-exec /bin/sh
+exec setsid cttyhack sh
 EOF
 chmod +x _install/init
 (cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
