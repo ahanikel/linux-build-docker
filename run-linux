@@ -1,0 +1,4 @@
+qemu-system-riscv64 -nographic -machine virt \
+    -kernel output/Image \
+    -append "console=ttyS0" \
+    -initrd output/initramfs.cpio.gz
