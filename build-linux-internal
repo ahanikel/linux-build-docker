@@ -1,4 +1,9 @@
 #!/bin/bash
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
+./scripts/config --enable CONFIG_NET_9P
+./scripts/config --enable CONFIG_NET_9P_VIRTIO
+./scripts/config --enable CONFIG_9P_FS
+./scripts/config --enable CONFIG_9P_FS_POSIX_ACL
+./scripts/config --enable CONFIG_VIRTIO_PCI
 time make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 cp -p arch/riscv/boot/Image* /output/

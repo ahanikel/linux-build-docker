@@ -18,6 +18,8 @@ mount -t sysfs none /sys
 mount -t devtmpfs devtmpfs /dev
 
 echo "Welcome to RISC-V Linux!"
+mkdir -p /mnt/host
+mount -t 9p -o trans=virtio,version=9p2000.L hostshare /mnt/host || true
 exec setsid cttyhack sh
 EOF
 chmod +x _install/init
