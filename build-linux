@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 rm -rf output
 mkdir output
-docker run -it --rm -v $(pwd)/output:/output linux-builder:1.0.0 /bin/bash -c /linux/build-linux-internal
+docker run -it --rm -v $(pwd)/output:/output linux-builder:1.0.0 /bin/bash -c /build-linux-internal

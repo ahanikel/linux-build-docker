@@ -1,4 +1,5 @@
 #!/bin/bash
+cd linux
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
 ./scripts/config --enable CONFIG_NET_9P
 ./scripts/config --enable CONFIG_NET_9P_VIRTIO

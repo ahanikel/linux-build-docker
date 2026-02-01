@@ -1,5 +1,7 @@
 FROM linux-builder-base:1.0.0
-RUN apt-get update && apt-get install -y cpio && rm -rf /var/lib/apt/lists/*
-COPY build-linux-internal .
-COPY build-initramfs-internal .
-RUN git pull origin master && git fetch --tags
+COPY build-linux-internal /
+COPY build-initramfs-internal /
+COPY mkimage /
+COPY boot.cmd /
+RUN (cd /linux && git pull origin master && git fetch --tags)
+RUN (cd /busybox && git pull origin master && git fetch --tags)

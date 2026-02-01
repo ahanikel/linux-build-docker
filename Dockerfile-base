@@ -19,8 +19,9 @@ RUN apt-get update && apt-get install -y \
     git \
     vim \
     dwarves \
+    cpio \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 
-WORKDIR /linux
+RUN git clone https://git.busybox.net/busybox

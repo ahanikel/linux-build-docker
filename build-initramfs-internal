@@ -1,7 +1,5 @@
 #!/bin/bash
-cd /
-git clone https://git.busybox.net/busybox
-cd busybox
+cd /busybox
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
 sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
         s/CONFIG_TC=y/CONFIG_TC=n/;
@@ -24,3 +22,5 @@ exec setsid cttyhack sh
 EOF
 chmod +x _install/init
 (cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
+cd ..
+/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd /output/boot.scr

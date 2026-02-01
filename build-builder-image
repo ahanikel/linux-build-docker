@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
+if [[ -f mkimage ]]
+then
+    rm -f mkimage
+fi
+cp ../u-boot/tools/mkimage .
 docker build -t linux-builder:1.0.0 -f Dockerfile .
