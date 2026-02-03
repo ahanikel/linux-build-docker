@@ -2,3 +2,4 @@ output/
 *~
 \#*
 mkimage
+*.qcow2

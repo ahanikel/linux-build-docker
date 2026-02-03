@@ -5,10 +5,18 @@ then
     share="-virtfs local,path=$2,mount_tag=hostshare,security_model=none,id=hostshare"
 fi
 
-    #-bios default \
+disk_image=$(dirname $0)/root.qcow2
+if [[ ! -f $disk_image ]]
+then
+    qemu-img create -f qcow2 $disk_image 10G
+fi
+
 qemu-system-riscv64 -nographic -machine virt \
     -bios default \
     -kernel output/u-boot.bin \
     -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
     -drive file=fat:rw:$(pwd)/output,format=raw,id=hd0,if=none \
-    -device virtio-blk-device,drive=hd0 $share
+    -device virtio-blk-device,drive=hd0 \
+    -drive file=$disk_image,format=qcow2,id=sda,if=none \
+    -device virtio-blk-device,drive=sda \
+    $share
