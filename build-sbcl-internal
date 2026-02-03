@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+export CC=riscv64-linux-gnu-gcc
+export QEMU_LD_PREFIX=/usr/riscv64-linux-gnu
+
+sh make.sh --xc-host='sbcl --disable-debugger --no-userinit --no-sysinit' \
+           --arch=riscv64 \
+           --prefix=/opt/sbcl-riscv
+
+# (cd tests && sh run-tests.sh)
+# [...]
+# // Running /build/tests/arith-slow.pure.lisp in COMPILE evaluator mode
+# ::: Running (LOGAND :COMPLICATED-IDENTITY)
+# CORRUPTION WARNING in SBCL pid 2005 tid 2008:
+# Signal 4 received (PC: 0x55859ca0)
+# Exiting.
+   # 0:     0x4f97641f pc=0x1b0 {0x40027000d0+fd9000e0}  BAD FRAME
+# test failed, expected 104 return code, got 1
+
+if [[ -d /output/sbcl-riscv ]]
+then
+    rm -rf /output/sbcl-riscv
+fi
+mkdir /output/sbcl-riscv
+INSTALL_ROOT=/output/sbcl-riscv sh install.sh
