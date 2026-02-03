@@ -20,7 +20,13 @@ RUN apt-get update && apt-get install -y \
     vim \
     dwarves \
     cpio \
+    libgnutls28-dev \
+    python3 \
+    python3-setuptools \
+    python3-pyelftools \
     && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/u-boot/u-boot
 
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 

@@ -8,7 +8,7 @@ fi
     #-bios default \
 qemu-system-riscv64 -nographic -machine virt \
     -bios default \
-    -kernel ../u-boot/u-boot.bin \
+    -kernel output/u-boot.bin \
     -device virtio-net-device,netdev=net0 -netdev user,id=net0 \
     -drive file=fat:rw:$(pwd)/output,format=raw,id=hd0,if=none \
     -device virtio-blk-device,drive=hd0 $share

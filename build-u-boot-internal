@@ -1,0 +1,7 @@
+cd /u-boot
+make distclean
+make qemu-riscv64_smode_defconfig
+sed -i 's/scriptaddr=0x[0-9a-fA-F]*/scriptaddr=0x82100000/' include/configs/qemu-riscv.h
+make CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
+cp u-boot.bin /output/
+cp tools/mkimage /output/

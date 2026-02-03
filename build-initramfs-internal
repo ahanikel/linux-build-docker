@@ -23,4 +23,4 @@ EOF
 chmod +x _install/init
 (cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
 cd ..
-/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd /output/boot.scr
+/output/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd /output/boot.scr
