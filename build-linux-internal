@@ -1,5 +1,6 @@
 #!/bin/bash
 cd linux
+
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
 ./scripts/config --enable CONFIG_NET_9P
 ./scripts/config --enable CONFIG_NET_9P_VIRTIO
@@ -8,3 +9,13 @@ make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
 ./scripts/config --enable CONFIG_VIRTIO_PCI
 time make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 cp -p arch/riscv/boot/Image* /output/
+
+mkdir -p /output/modules
+find . -name '*.ko' | while read mod
+do
+    mkdir -p /output/modules/$(dirname $mod)
+    cp $mod /output/modules/$mod
+done
+
+mkdir -p /output/headers
+make headers_install INSTALL_HDR_PATH="/output/headers"
