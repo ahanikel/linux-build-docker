@@ -1,0 +1,16 @@
+#!/bin/bash
+cd e2fsprogs
+
+mkdir build && cd build
+
+LDFLAGS="-static" ../configure --host=riscv64-linux-gnu \
+                  CC=riscv64-linux-gnu-gcc \
+                  --prefix=/usr
+
+make -j$(nproc)
+
+if [[ -d /output/e2fsprogs ]]
+then
+    rm -rf /output/e2fsprogs
+fi
+make install DESTDIR=/output/e2fsprogs

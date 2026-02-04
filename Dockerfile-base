@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc-riscv64-linux-gnu \
+    g++-riscv64-linux-gnu \
     binutils-riscv64-linux-gnu \
     bc \
     rsync \
@@ -24,10 +25,15 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-setuptools \
     python3-pyelftools \
+    texinfo \
+    autoconf \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/u-boot/u-boot
 
 RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+RUN git clone git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
 
 RUN git clone https://git.busybox.net/busybox
