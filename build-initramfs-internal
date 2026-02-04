@@ -8,7 +8,7 @@ sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- oldconfig
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- install
-mkdir -p _install/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin,dev}
+mkdir -p _install/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin,dev,lib}
 cat <<EOF > _install/init
 #!/bin/sh
 mount -t proc none /proc
@@ -19,8 +19,15 @@ echo "Welcome to RISC-V Linux!"
 mkdir -p /mnt/host
 mount -t 9p -o trans=virtio,version=9p2000.L hostshare /mnt/host || true
 exec setsid cttyhack sh
+
+if [[ -d /lib/modules/arch ]]
+then
+    mkdir /lib/modules/`uname -r`
+    mv /lib/modules/* /lib/modules/`uname -r`/
+fi
 EOF
 chmod +x _install/init
+cp -pR /output/modules _install/lib/
 (cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
 cd ..
 /output/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd /output/boot.scr

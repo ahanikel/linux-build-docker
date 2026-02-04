@@ -7,7 +7,7 @@ export QEMU_LD_PREFIX=/usr/riscv64-linux-gnu
 
 sh make.sh --xc-host='sbcl --disable-debugger --no-userinit --no-sysinit' \
            --arch=riscv64 \
-           --prefix=/opt/sbcl-riscv
+           --prefix=/usr
 
 # (cd tests && sh run-tests.sh)
 # [...]
