@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+(cd glibc && git pull origin release/2.43/master)
+mkdir glibc-build
+cd glibc-build
+
+../glibc/configure \
+    --host=riscv64-linux-gnu \
+    --prefix=/usr \
+    --with-headers=/output/headers/include \
+    --disable-werror
+
+make
+rm -rf /output/glibc
+mkdir /output/glibc
+make install DESTDIR=/output/glibc

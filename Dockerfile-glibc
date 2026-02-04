@@ -1,0 +1,21 @@
+FROM ubuntu:24.04
+
+# Prevent interactive prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install build essentials and the RISC-V cross-compiler
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    crossbuild-essential-riscv64 \
+    python3 \
+    gawk \
+    bison \
+    flex \
+    texinfo \
+    sed \
+    git \
+    wget
+
+RUN git clone --depth 1 --branch release/2.43/master https://sourceware.org/git/glibc.git
+
+COPY build-glibc-internal .

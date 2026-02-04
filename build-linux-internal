@@ -10,6 +10,7 @@ make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
 time make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 cp -p arch/riscv/boot/Image* /output/
 
+rm -rf /output/modules
 mkdir -p /output/modules
 find . -name '*.ko' | while read mod
 do
@@ -17,5 +18,6 @@ do
     cp $mod /output/modules/$mod
 done
 
+rm -rf /output/headers
 mkdir -p /output/headers
 make headers_install INSTALL_HDR_PATH="/output/headers"

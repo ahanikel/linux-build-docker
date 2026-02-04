@@ -4,6 +4,6 @@ COPY build-linux-internal /
 COPY build-initramfs-internal /
 COPY boot.cmd /
 COPY initramfs-init /
-RUN (cd /u-boot && git pull origin master && git fetch --tags)
-RUN (cd /linux && git pull origin master && git fetch --tags)
-RUN (cd /busybox && git pull origin master && git fetch --tags)
+RUN (cd /u-boot && git pull origin master)
+RUN (cd /linux && git pull origin master)
+RUN (cd /busybox && git pull origin master)
