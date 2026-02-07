@@ -1,0 +1,47 @@
+.PHONY: run clean
+
+run: run-uboot-linux output/u-boot.bin output/boot.scr
+	./run-uboot-linux --share .
+
+clean:
+	rm -rf output
+
+output/base-image: Dockerfile-base
+	mkdir -p output
+	docker build -t base-image -f Dockerfile-base .
+	touch output/base-image
+
+output/u-boot-image: Dockerfile-u-boot build-u-boot-internal output/base-image
+	docker build -t u-boot-image -f Dockerfile-u-boot .
+	touch output/u-boot-image
+
+output/linux-image: Dockerfile-linux output/base-image
+	docker build -t linux-image -f Dockerfile-linux .
+	touch output/linux-image
+
+output/busybox-image: Dockerfile-busybox output/base-image
+	docker build -t busybox-image -f Dockerfile-busybox .
+	touch output/busybox-image
+
+output/initramfs-image: Dockerfile-initramfs build-initramfs-internal output/base-image
+	docker build -t initramfs-image -f Dockerfile-initramfs .
+	touch output/initramfs-image
+
+output/e2fsprogs-image: Dockerfile-e2fsprogs build-e2fsprogs-internal output/base-image
+	docker build -t e2fsprogs-image -f Dockerfile-e2fsprogs .
+	touch output/e2fsprogs-image
+
+output/u-boot.bin output/mkimage: output/u-boot-image
+	docker run -it --rm -v ./output:/output u-boot-image /build-u-boot-internal
+
+output/Image: output/linux-image
+	docker run -it --rm -v ./output:/output linux-image /build-linux-internal
+
+output/busybox.tar.gz: output/busybox-image
+	docker run -it --rm -v ./output:/output busybox-image /build-busybox-internal
+
+output/initramfs.cpio.gz: output/initramfs-image output/busybox.tar.gz
+	docker run -it --rm -v ./output:/output initramfs-image /build-initramfs-internal
+
+output/boot.scr: boot.cmd output/mkimage output/Image output/initramfs.cpio.gz
+	docker run -it --rm -v ./boot.cmd:/boot.cmd -v ./output:/output base-image /output/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd output/boot.scr

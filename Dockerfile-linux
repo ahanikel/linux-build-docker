@@ -1,0 +1,3 @@
+FROM base-image
+RUN git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+COPY build-linux-internal /

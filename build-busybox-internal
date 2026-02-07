@@ -1,0 +1,12 @@
+#!/bin/bash
+cd /busybox
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- defconfig
+sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
+        s/CONFIG_TC=y/CONFIG_TC=n/;
+        s/CONFIG_FEATURE_TC_INGRESS=y/CONFIG_FEATURE_TC_INGRESS=n/' \
+       .config
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- oldconfig
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
+make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- install
+mv _install static
+tar zcvf /output/busybox.tar.gz static
