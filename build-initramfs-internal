@@ -8,9 +8,13 @@ sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- oldconfig
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- install
+mv _install static
 mkdir -p _install/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin,dev,lib}
-cat <<EOF > _install/init
-#!/bin/sh
+mv static _install/
+cat <<'EOF' > _install/init
+#!/static/bin/sh
+export PATH=/static/sbin:/static/bin:/static/usr/sbin:/static/usr/bin
+
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs devtmpfs /dev
@@ -18,13 +22,14 @@ mount -t devtmpfs devtmpfs /dev
 echo "Welcome to RISC-V Linux!"
 mkdir -p /mnt/host
 mount -t 9p -o trans=virtio,version=9p2000.L hostshare /mnt/host || true
-exec setsid cttyhack sh
 
 if [[ -d /lib/modules/arch ]]
 then
     mkdir /lib/modules/`uname -r`
     mv /lib/modules/* /lib/modules/`uname -r`/
 fi
+
+exec setsid cttyhack sh
 EOF
 chmod +x _install/init
 cp -pR /output/modules _install/lib/
