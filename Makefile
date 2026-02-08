@@ -1,6 +1,6 @@
 .PHONY: run clean
 
-run: run-uboot-linux output/u-boot.bin output/boot.scr
+run: run-uboot-linux output/u-boot.bin output/boot.scr output/e2fsprogs.tar.gz
 	./run-uboot-linux --share .
 
 clean:
@@ -45,3 +45,7 @@ output/initramfs.cpio.gz: output/initramfs-image output/busybox.tar.gz
 
 output/boot.scr: boot.cmd output/mkimage output/Image output/initramfs.cpio.gz
 	docker run -it --rm -v ./boot.cmd:/boot.cmd -v ./output:/output base-image /output/mkimage -A riscv -T script -C none -n "Boot Script" -d /boot.cmd output/boot.scr
+
+output/e2fsprogs.tar.gz: output/e2fsprogs-image
+	docker run -it --rm -v ./output:/output e2fsprogs-image /build-e2fsprogs-internal
+
