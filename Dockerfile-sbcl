@@ -14,10 +14,8 @@ RUN apt-get update && apt-get install -y \
     time \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /build
-
 # Clone SBCL source
-RUN git clone https://github.com/sbcl/sbcl.git .
+RUN git clone https://github.com/sbcl/sbcl.git
 
 # Set environment variables for the cross-compiler
 ENV SBCL_ARCH=riscv64

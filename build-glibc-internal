@@ -10,6 +10,7 @@ cd glibc-build
     --disable-werror
 
 make
-rm -rf /output/glibc
-mkdir /output/glibc
-make install DESTDIR=/output/glibc
+mkdir /glibc-install
+make install DESTDIR=/glibc-install
+(cd /glibc-install && tar zcvfp /output/glibc.tar.gz *)
+
