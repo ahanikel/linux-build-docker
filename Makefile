@@ -1,6 +1,6 @@
 .PHONY: run clean
 
-run: run-uboot-linux output/u-boot.bin output/boot.scr output/e2fsprogs.tar.gz
+run: run-uboot-linux output/u-boot.bin output/boot.scr output/e2fsprogs.tar.gz output/alpine.tar.gz
 	./run-uboot-linux --share .
 
 clean:
@@ -49,3 +49,5 @@ output/boot.scr: boot.cmd output/mkimage output/Image output/initramfs.cpio.gz
 output/e2fsprogs.tar.gz: output/e2fsprogs-image
 	docker run -it --rm -v ./output:/output e2fsprogs-image /build-e2fsprogs-internal
 
+output/alpine.tar.gz:
+	docker run --platform linux/riscv64 -it --rm -v ./output:/output alpine /bin/sh -c 'apk update && apk add parted && rm -rf /var/lib/apt/lists/* && tar zcvpf /output/alpine.tar.gz bin etc lib sbin tmp usr var'
