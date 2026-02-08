@@ -1,0 +1,55 @@
+#!/static/bin/sh
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/static/sbin:/static/bin:/static/usr/sbin:/static/usr/bin
+
+set -e
+
+tar zxvfp /mnt/host/output/alpine.tar.gz
+tar zxvfp /mnt/host/output/e2fsprogs.tar.gz
+(mkdir -p lib/modules/$(uname -r) && cd lib/modules/$(uname -r) && tar zxvfp /mnt/host/output/linux-modules.tar.gz)
+modprobe nls_iso8859-1
+
+parted -s /dev/vdb -- \
+       mklabel gpt \
+       mkpart boot fat32 2048s 513MB \
+       type 1 C12A7328-F81F-11D2-BA4B-00A0C93EC93B \
+       mkpart root ext4  513MB -1MB
+
+mkfs.vfat -F 32 /dev/vdb1
+mkfs.ext4 /dev/vdb2
+
+mount /dev/vdb2 /root
+mkdir /root/boot
+mkdir /root/tmp
+chmod 1777 /root/tmp
+mount -t vfat /dev/vdb1 /root/boot
+
+cp /mnt/host/output/Image /root/boot/
+
+rm -rf initramfs || true
+mkdir initramfs
+(cd initramfs && mkdir static static/bin static/sbin static/usr static/usr/bin static/usr/sbin && cp /mnt/host/output/busybox static/bin/ && cat /mnt/host/output/busybox-links | while read l; do ln -s /static/bin/busybox static/$l; done && cp /mnt/host/initramfs-init init && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /root/boot/initrd.img)
+mkdir /root/boot/extlinux
+cat > /root/boot/extlinux/extlinux.conf <<'EOF'
+label linux
+kernel /Image
+    initrd /initrd.img
+    append root=/dev/vda2 rw console=ttyS0,115200 earlycon
+EOF
+(cd root && mkdir -p static/bin && cp /mnt/host/output/busybox static/bin/busybox && ln -s /static/bin/busybox static/bin/sh)
+(cd root && tar zxvpf /mnt/host/output/sbcl.tar.gz)
+(cd root && tar zxvpf /mnt/host/output/glibc.tar.gz)
+
+cat <<'EOF' > /root/init
+#!/static/bin/sh
+/static/bin/busybox mount -o remount,rw /dev/vda2 /
+/static/bin/busybox mkdir -p dev proc sys
+/static/bin/busybox mount -t proc none /proc
+/static/bin/busybox mount -t sysfs none /sys
+/static/bin/busybox mount -t devtmpfs devtmpfs /dev
+exec /bin/sbcl --core /lib/sbcl/sbcl.core
+EOF
+chmod +x /root/init
+
+umount /root/boot
+umount /root

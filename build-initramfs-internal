@@ -1,7 +1,13 @@
 #!/bin/bash
 mkdir -p _install/{bin,sbin,etc,proc,sys,usr/bin,usr/sbin,dev,lib}
-(cd _install && tar zxvf /output/busybox.tar.gz)
-cat <<'EOF' > _install/init
+mkdir -p _install/static/{bin,sbin,usr/bin,usr/sbin}
+cd _install
+cp /output/busybox static/bin/
+cat /output/busybox-links | while read l
+do
+    ln -s /static/bin/busybox static/$l
+done
+cat <<'EOF' > init
 #!/static/bin/sh
 export PATH=/static/sbin:/static/bin:/static/usr/sbin:/static/usr/bin
 
@@ -21,5 +27,5 @@ fi
 
 exec setsid cttyhack sh
 EOF
-chmod +x _install/init
-(cd _install && find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz)
+chmod +x init
+find . -print0 | cpio --null -ov --format=newc | gzip -9 > /output/initramfs.cpio.gz

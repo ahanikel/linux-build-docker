@@ -1,7 +1,10 @@
-.PHONY: run clean
+.PHONY: run stage clean
 
-run: run-uboot-linux output/u-boot.bin output/boot.scr output/e2fsprogs.tar.gz output/alpine.tar.gz
-	./run-uboot-linux --share .
+run:
+	./run-uboot-linux
+
+stage: output/u-boot.bin output/Image output/initramfs.cpio.gz output/boot.scr output/e2fsprogs.tar.gz output/alpine.tar.gz output/glibc.tar.gz output/sbcl.tar.gz
+	./run-uboot-linux-stage --share .
 
 clean:
 	rm -rf output
@@ -19,7 +22,7 @@ output/linux-image: Dockerfile-linux output/base-image
 	docker build -t linux-image -f Dockerfile-linux .
 	touch output/linux-image
 
-output/busybox-image: Dockerfile-busybox output/base-image
+output/busybox-image: Dockerfile-busybox build-busybox-internal output/base-image
 	docker build -t busybox-image -f Dockerfile-busybox .
 	touch output/busybox-image
 
@@ -31,16 +34,24 @@ output/e2fsprogs-image: Dockerfile-e2fsprogs build-e2fsprogs-internal output/bas
 	docker build -t e2fsprogs-image -f Dockerfile-e2fsprogs .
 	touch output/e2fsprogs-image
 
+output/glibc-image: Dockerfile-glibc build-glibc-internal output/base-image
+	docker build -t glibc-image -f Dockerfile-glibc .
+	touch output/glibc-image
+
+output/sbcl-image: Dockerfile-sbcl build-sbcl-internal output/base-image
+	docker build -t sbcl-image -f Dockerfile-sbcl .
+	touch output/sbcl-image
+
 output/u-boot.bin output/mkimage: output/u-boot-image
 	docker run -it --rm -v ./output:/output u-boot-image /build-u-boot-internal
 
 output/Image: output/linux-image
 	docker run -it --rm -v ./output:/output linux-image /build-linux-internal
 
-output/busybox.tar.gz: output/busybox-image
+output/busybox output/busybox-links: output/busybox-image
 	docker run -it --rm -v ./output:/output busybox-image /build-busybox-internal
 
-output/initramfs.cpio.gz: output/initramfs-image output/busybox.tar.gz
+output/initramfs.cpio.gz: output/initramfs-image output/busybox
 	docker run -it --rm -v ./output:/output initramfs-image /build-initramfs-internal
 
 output/boot.scr: boot.cmd output/mkimage output/Image output/initramfs.cpio.gz
@@ -51,3 +62,9 @@ output/e2fsprogs.tar.gz: output/e2fsprogs-image
 
 output/alpine.tar.gz:
 	docker run --platform linux/riscv64 -it --rm -v ./output:/output alpine /bin/sh -c 'apk update && apk add parted && rm -rf /var/lib/apt/lists/* && tar zcvpf /output/alpine.tar.gz bin etc lib sbin tmp usr var'
+
+output/glibc.tar.gz: output/glibc-image
+	docker run -it --rm -v ./output:/output glibc-image /build-glibc-internal
+
+output/sbcl.tar.gz: output/sbcl-image
+	docker run -it --rm -v ./output:/output sbcl-image /build-sbcl-internal

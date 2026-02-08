@@ -8,5 +8,5 @@ sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/;
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- oldconfig
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
 make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- install
-mv _install static
-tar zcvf /output/busybox.tar.gz static
+cp _install/bin/busybox /output
+(cd _install && find . -type l) > /output/busybox-links

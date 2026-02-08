@@ -2,6 +2,8 @@
 
 set -e
 
+cd /sbcl
+
 export CC=riscv64-linux-gnu-gcc
 export QEMU_LD_PREFIX=/usr/riscv64-linux-gnu
 
@@ -19,9 +21,7 @@ sh make.sh --xc-host='sbcl --disable-debugger --no-userinit --no-sysinit' \
    # 0:     0x4f97641f pc=0x1b0 {0x40027000d0+fd9000e0}  BAD FRAME
 # test failed, expected 104 return code, got 1
 
-if [[ -d /output/sbcl-riscv ]]
-then
-    rm -rf /output/sbcl-riscv
-fi
-mkdir /output/sbcl-riscv
-INSTALL_ROOT=/output/sbcl-riscv sh install.sh
+mkdir /sbcl-riscv
+INSTALL_ROOT=/sbcl-riscv sh install.sh
+(cd /sbcl-riscv && tar zcvfp /output/sbcl.tar.gz *)
+
