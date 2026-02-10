@@ -42,7 +42,6 @@ cp /mnt/host/init.lisp /root
 
 cat <<'EOF' > /root/init
 #!/static/bin/sh
-echo 0 > /proc/sys/debug/exception-trace
 exec /usr/bin/sbcl --load /init.lisp
 EOF
 chmod +x /root/init

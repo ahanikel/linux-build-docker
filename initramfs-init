@@ -29,6 +29,7 @@ if [ -b "$ROOT" ]; then
     mount -t proc none /newroot/proc
     mount -t sysfs none /newroot/sys
     mount -t devtmpfs devtmpfs /newroot/dev
+    echo 0 > /proc/sys/debug/exception-trace
 
     echo "Switching to real root..."
     exec /static/sbin/switch_root /newroot /init
