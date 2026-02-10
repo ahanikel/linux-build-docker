@@ -26,6 +26,9 @@ if [ -b "$ROOT" ]; then
     echo "Mounting $ROOT..."
     mkdir -p /newroot
     mount -o ro "$ROOT" /newroot  # Mount as read-only initially
+    mount -t proc none /newroot/proc
+    mount -t sysfs none /newroot/sys
+    mount -t devtmpfs devtmpfs /newroot/dev
 
     echo "Switching to real root..."
     exec /static/sbin/switch_root /newroot /init

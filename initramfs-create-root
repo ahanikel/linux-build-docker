@@ -19,8 +19,7 @@ mkfs.vfat -F 32 /dev/vdb1
 mkfs.ext4 /dev/vdb2
 
 mount /dev/vdb2 /root
-mkdir /root/boot
-mkdir /root/tmp
+(cd /root && mkdir boot dev proc sys tmp usr)
 chmod 1777 /root/tmp
 mount -t vfat /dev/vdb1 /root/boot
 
@@ -37,17 +36,14 @@ kernel /Image
     append root=/dev/vda2 rw console=ttyS0,115200 earlycon
 EOF
 (cd root && mkdir -p static/bin && cp /mnt/host/output/busybox static/bin/busybox && ln -s /static/bin/busybox static/bin/sh)
-(cd root && tar zxvpf /mnt/host/output/sbcl.tar.gz)
+(cd root/usr && tar zxvpf /mnt/host/output/sbcl.tar.gz)
 (cd root && tar zxvpf /mnt/host/output/glibc.tar.gz)
+cp /mnt/host/init.lisp /root
 
 cat <<'EOF' > /root/init
 #!/static/bin/sh
-/static/bin/busybox mount -o remount,rw /dev/vda2 /
-/static/bin/busybox mkdir -p dev proc sys
-/static/bin/busybox mount -t proc none /proc
-/static/bin/busybox mount -t sysfs none /sys
-/static/bin/busybox mount -t devtmpfs devtmpfs /dev
-exec /bin/sbcl --core /lib/sbcl/sbcl.core
+echo 0 > /proc/sys/debug/exception-trace
+exec /usr/bin/sbcl --load /init.lisp
 EOF
 chmod +x /root/init
 
