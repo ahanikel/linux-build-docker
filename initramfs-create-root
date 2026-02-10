@@ -16,7 +16,7 @@ parted -s /dev/vdb -- \
        mkpart root ext4  513MB -1MB
 
 mkfs.vfat -F 32 /dev/vdb1
-mkfs.ext4 /dev/vdb2
+mkfs.ext4 -F /dev/vdb2
 
 mount /dev/vdb2 /root
 (cd /root && mkdir boot dev proc sys tmp usr)
